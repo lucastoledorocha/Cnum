@@ -2,7 +2,7 @@ def bissecao(f,     # função que queremos encontrar a raiz
               a,    # a início do intervalo
               b,    # b fim do intervalo
               TOL,   # erro tolerado
-              iter=16):  # número máximo de iterações
+              iter):  # número máximo de iterações
     c = (a + b) / 2  # ponto médio entre os valores a e b
     if f(a) * f(b) > 0:
         raise ValueError("Nenhuma raiz encontrada no intervalo.")
