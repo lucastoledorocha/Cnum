@@ -144,6 +144,76 @@ def seidel(A: np.ndarray, B: np.ndarray, k: int, TOL: float) -> np.ndarray:
             return X
     return X
 
+
+def newton_coef(x, y):
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    n = len(x)
+    a = y.copy()
+    for j in range(1, n):
+        a[j:n] = (a[j:n] - a[j - 1 : n - 1]) / (x[j:n] - x[0 : n - j])
+    return a
+
+
+def newton(x, y):
+    a = newton_coef(x, y)
+    p = np.array([a[-1]], dtype=float)
+    for k in range(len(a) - 2, -1, -1):
+        p = np.convolve(p, np.array([1.0, -x[k]], dtype=float))
+        p[-1] += a[k]
+    return p
+
+
+def lagrange_add(p, q):
+    if len(q) > len(p):
+        p, q = q, p
+    off = len(p) - len(q)
+    res = np.array(p, dtype=float, copy=True)
+    for i in range(len(q)):
+        res[off + i] += q[i]
+    return res
+
+
+def lagrange_mul(p, q):
+    deg = (len(p) - 1) + (len(q) - 1)
+    res = np.zeros(deg + 1, dtype=float)
+    for i, a in enumerate(p):
+        for j, b in enumerate(q):
+            res[i + j] += a * b
+    return res
+
+
+def lagrange_scale(p, s):
+    return np.asarray(p, dtype=float) * s
+
+
+def lagrange(x, y):
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    n = len(x)
+    p = np.array([0.0], dtype=float)
+    for i in range(n):
+        m = np.array([1.0], dtype=float)
+        d = 1.0
+        xi = x[i]
+        for j in range(n):
+            if j == i:
+                continue
+            m = lagrange_mul(m, np.array([1.0, -x[j]], dtype=float))
+            d *= xi - x[j]
+        pi = lagrange_scale(m, y[i] / d)
+        p = lagrange_add(p, pi)
+    return p
+
+
+def polinomial(x, y):
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    n = len(x)
+    V = np.vander(x, N=n, increasing=False)
+    return np.linalg.solve(V, y.astype(float))
+
+
 def JN(x, F, eps=1e-8):
     x = np.asarray(x, dtype=float)
     n = x.size
