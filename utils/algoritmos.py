@@ -244,3 +244,23 @@ def fixed_point(a, g, TOL=1e-8, iter=1000):
         x = g(a)
         i += 1
     return x
+
+
+def dp(f, x, h):
+    return (f(x + h) - f(x)) / h
+
+
+def dr(f, x, h):
+    return (f(x) - f(x - h)) / h
+
+
+def dc(f, x, h):
+    return (f(x + h) - f(x - h)) / (2 * h)
+
+
+def regressao(x, y, v):
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    V = v(x)
+    Vt = V.T
+    return np.linalg.solve(Vt @ V, Vt @ y)
